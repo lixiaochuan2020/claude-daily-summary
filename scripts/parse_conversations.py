@@ -26,9 +26,10 @@ def get_target_date() -> date:
 def project_name_from_path(path: str) -> str:
     """Extract a readable project name from the projects directory path.
 
-    e.g. '-Users-lxc-Code-my-project' -> 'my-project'
-         '-Users-lxc--config-ghostty' -> 'config/ghostty'
-         '-Users-lxc-Code' -> 'Code (root)'
+    Claude Code stores projects with path-encoded directory names, e.g.:
+      '-Users-alice-Code-my-project' -> 'my-project'
+      '-Users-alice--config-ghostty' -> 'config/ghostty'
+      '-Users-alice-Code'            -> '~/Code'
     """
     dirname = os.path.basename(path)
     # The dirname represents a filesystem path with dashes replacing slashes

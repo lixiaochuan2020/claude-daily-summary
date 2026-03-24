@@ -30,8 +30,29 @@ mkdir -p "$(dirname "$OUTPUT")"
 
 # Check for typst
 if ! command -v typst &> /dev/null; then
-    echo "typst not found. Installing via Homebrew..."
-    brew install typst
+    echo "typst not found. Attempting to install..."
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        if command -v brew &>/dev/null; then
+            brew install typst
+        else
+            echo "Error: Homebrew not found. Install typst manually:"
+            echo "  https://github.com/typst/typst/releases"
+            exit 1
+        fi
+    elif [[ "$OSTYPE" == "linux"* ]]; then
+        if command -v cargo &>/dev/null; then
+            cargo install typst-cli
+        else
+            echo "Error: Install typst manually:"
+            echo "  https://github.com/typst/typst/releases"
+            echo "  or: cargo install typst-cli"
+            exit 1
+        fi
+    else
+        echo "Error: Please install typst manually:"
+        echo "  https://github.com/typst/typst/releases"
+        exit 1
+    fi
 fi
 
 # Generate PDF with typst

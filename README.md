@@ -5,60 +5,58 @@ A Claude Code skill that reads your daily conversations (local + web) and summar
 ## Features
 
 - Scans all local Claude Code conversation history from today
-- Fetches today's conversations from claude.ai (web)
+- Fetches today's conversations from claude.ai (web, optional)
 - Extracts key learnings, new concepts, useful commands, and problems solved
 - Generates a Typst document with inline `fletcher` diagrams for complex concepts
 - Compiles to a styled PDF at `~/Documents/daily-summaries/YYYY-MM-DD.pdf`
 
 ## Prerequisites
 
+- [Claude Code](https://docs.anthropic.com/en/docs/claude-code) — Claude's CLI coding agent
 - [uv](https://docs.astral.sh/uv/) — Python package manager
-- [typst](https://typst.app/) — Modern typesetting system (replaces LaTeX/pandoc)
+- [typst](https://typst.app/) — Modern typesetting system
 
+**macOS:**
 ```bash
 brew install uv typst
 ```
 
-## Setup
-
-### 1. Install Python dependencies
-
+**Linux:**
 ```bash
-cd ~/Code/claude-daily-summary
-uv sync
+# uv
+curl -LsSf https://astral.sh/uv/install.sh | sh
+# typst (via cargo, or download from https://github.com/typst/typst/releases)
+cargo install typst-cli
 ```
 
-### 2. Configure Claude session key (for web conversations)
+## Installation
 
-To include conversations from claude.ai (not just local Claude Code sessions), you need to provide your session cookie.
+```bash
+git clone https://github.com/YOUR_USERNAME/claude-daily-summary.git
+cd claude-daily-summary
+bash install.sh
+```
 
-**Get your session key:**
+The install script will:
+1. Copy the skill definition to `~/.claude/skills/daily-summary/`
+2. Save the project path to `~/.config/claude-daily-summary/config.json`
+3. Sync Python dependencies
+
+### Configure web conversations (optional)
+
+To include conversations from claude.ai (not just local Claude Code sessions), provide your session cookie:
 
 1. Open https://claude.ai/chats in your browser (make sure you're logged in)
 2. Open DevTools: `Cmd+Option+I` (Mac) or `F12` (Windows/Linux)
 3. Go to **Application** tab > **Cookies** > `https://claude.ai`
 4. Find the cookie named `sessionKey` and copy its value (starts with `sk-ant-sid01-...`)
-
-**Save it to the config file:**
-
-```bash
-mkdir -p ~/.config/claude-daily-summary
-cat > ~/.config/claude-daily-summary/config.json << 'EOF'
-{
-    "claude_session_key": "sk-ant-sid01-PASTE_YOUR_KEY_HERE"
-}
-EOF
-```
+5. Edit `~/.config/claude-daily-summary/config.json` and set `claude_session_key`
 
 > **Important:** Keep this file private. The session key grants full access to your claude.ai account.
 
-### 3. Verify the skill is registered
-
-Open Claude Code and type `/daily-summary`. If it appears in the autocomplete, you're set.
-
 ## Usage
 
-In any Claude Code session, run:
+In any Claude Code session, type:
 
 ```
 /daily-summary
@@ -66,12 +64,12 @@ In any Claude Code session, run:
 
 The skill will:
 1. Parse today's local conversations from `~/.claude/projects/`
-2. Fetch today's web conversations from claude.ai
+2. Fetch today's web conversations from claude.ai (if configured)
 3. Extract and summarize key learnings
-4. Generate a Typst document with inline diagrams for complex topics
+4. Generate a Typst document with inline diagrams
 5. Compile to PDF at `~/Documents/daily-summaries/YYYY-MM-DD.pdf`
 
-You can also run the scripts directly:
+### Run scripts directly
 
 ```bash
 # Parse local conversations only
@@ -91,7 +89,7 @@ bash scripts/generate_pdf.sh /tmp/daily-summary-2026-03-16.typ
 
 ### Session key expiration
 
-The claude.ai session key **expires periodically** (typically every few weeks). When it expires, the web fetcher will print an error and the skill will proceed with local conversations only. To fix, repeat the session key setup step above with a fresh key.
+The claude.ai session key **expires periodically** (typically every few weeks). When it expires, the web fetcher will print an error and the skill will proceed with local conversations only. Repeat the session key setup with a fresh key to restore web conversation fetching.
 
 ### Privacy
 
@@ -101,7 +99,7 @@ The claude.ai session key **expires periodically** (typically every few weeks). 
 
 ### Typst and diagrams
 
-- The PDF is generated using [Typst](https://typst.app/), a modern typesetting system with native Unicode/CJK support
+- PDF generation uses [Typst](https://typst.app/), a modern typesetting system with native Unicode/CJK support
 - Inline diagrams use the [fletcher](https://typst.app/universe/package/fletcher/) package (auto-downloaded on first compile)
 - Diagrams are only added for topics that genuinely benefit from visual explanation
 - The template (`templates/daily-summary.typ`) defines the color scheme, layout, and reusable components
@@ -113,18 +111,37 @@ claude-daily-summary/
 ├── scripts/
 │   ├── parse_conversations.py      # Parse local Claude Code JSONL sessions
 │   ├── fetch_web_conversations.py  # Fetch conversations from claude.ai API
-│   └── generate_pdf.sh             # Typst → PDF compilation
+│   └── generate_pdf.sh             # Typst → PDF compilation (cross-platform)
 ├── templates/
 │   ├── daily-summary.typ           # Typst template (layout, colors, components)
 │   └── daily-summary.md            # Legacy Markdown template
-├── pyproject.toml                   # uv project config
+├── skill/
+│   ├── SKILL.md                    # Skill definition (copied to ~/.claude/skills/ on install)
+│   └── references/
+│       └── EXTRACTION_GUIDE.md     # Knowledge extraction guidelines
+├── install.sh                       # One-command installer
+├── pyproject.toml                   # Python project config (uv)
 └── README.md
+```
 
+**After installation, these are created:**
+
+```
 ~/.claude/skills/daily-summary/
 ├── SKILL.md                         # Skill definition (triggers, workflow)
 └── references/
     └── EXTRACTION_GUIDE.md          # Knowledge extraction guidelines
 
 ~/.config/claude-daily-summary/
-└── config.json                      # Session key config
+└── config.json                      # Install path + session key config
+
+~/Documents/daily-summaries/
+└── YYYY-MM-DD.pdf                   # Generated PDF output
+```
+
+## Uninstall
+
+```bash
+rm -rf ~/.claude/skills/daily-summary
+rm -rf ~/.config/claude-daily-summary
 ```

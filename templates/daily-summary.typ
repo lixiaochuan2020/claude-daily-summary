@@ -33,7 +33,7 @@
     {
       text(subtle, size: 8pt, weight: "medium", upper(lang))
       v(4pt)
-      text(font: "Menlo", size: 9pt, body)
+      text(font: ("Menlo", "Consolas", "DejaVu Sans Mono", "monospace"), size: 9pt, body)
     }
   )
 }
@@ -135,7 +135,7 @@
       inset: 10pt,
       above: 8pt,
       below: 8pt,
-      text(font: "Menlo", size: 9pt, it)
+      text(font: ("Menlo", "Consolas", "DejaVu Sans Mono", "monospace"), size: 9pt, it)
     )
   }
 
@@ -145,7 +145,7 @@
       stroke: border,
       radius: 2pt,
       inset: (x: 4pt, y: 2pt),
-      text(font: "Menlo", size: 9pt, it)
+      text(font: ("Menlo", "Consolas", "DejaVu Sans Mono", "monospace"), size: 9pt, it)
     )
   }
 
