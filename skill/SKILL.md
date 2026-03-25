@@ -81,7 +81,6 @@ The template provides these utilities:
 - `#tag("label", color: accent)` — colored tag chips for categorizing topics (e.g., "Web", "Research", "Local")
 - `#concept-card("Title")[Description]` — highlighted card for new concepts
 - `#problem-solved("Problem", "Solution")` — formatted problem→solution block
-- `#snippet-box(lang: "bash")[code]` — optional styled code box (raw code blocks are also styled automatically)
 
 ### Step 4: Extract Knowledge & Generate Typst
 
@@ -104,13 +103,12 @@ Analyze the parsed conversations and produce a Typst file at `/tmp/daily-summary
 
 = Key Learnings
 
-== Topic Name #tag("Web") #tag("Research", color: warning)
+== Knowledge Domain #tag("Web") #tag("Research", color: warning)
 
-=== Subtopic
-- Learning point with *bold key terms*
-- Another learning point
+- Concise, transferable insight with *bold key terms*
+- Another insight — focus on "what would I Google later?"
 
-// Add a fletcher diagram when a concept benefits from visual explanation
+// Add a fletcher diagram ONLY when it genuinely aids comprehension
 #figure(
   diagram(
     node-stroke: 1pt,
@@ -124,19 +122,9 @@ Analyze the parsed conversations and produce a Typst file at `/tmp/daily-summary
 = New Concepts
 
 #concept-card("Concept Name")[
-  Brief explanation of what was learned and why it matters.
+  Brief explanation of the concept and why it matters. Not what you did with it — what it IS.
 ]
 
-= Commands & Code Snippets
-
-=== Description of the command
-\`\`\`bash
-command here
-\`\`\`
-
-= Problems Solved
-
-#problem-solved("Problem description", "How it was solved")
 ```
 
 **IMPORTANT:** In the generated `.typ` file, replace `$PROJECT_DIR` with the actual absolute path from Step 0. The `#import` must use an absolute path since Typst is compiled with `--root /`.
@@ -198,9 +186,11 @@ open ~/Documents/daily-summaries/YYYY-MM-DD.pdf  # macOS
 
 - The skill processes ALL projects under `~/.claude/projects/`
 - Messages are filtered by timestamp, not just file modification time
-- The summary should be concise but comprehensive
-- Focus on what the USER learned, not routine operations
-- Code snippets should only include genuinely useful/novel ones
+- **This is a KNOWLEDGE summary, NOT an activity log.** Never describe what was built, fixed, or implemented. Only describe transferable insights learned in the process.
+- Ask for each conversation: "What would I wish I remembered in 6 months?" — if nothing, skip it entirely.
+- Aim for **5-15 concise learnings** for a full day. A day with 3 deep insights beats 20 shallow ones.
+- Group by knowledge domain (e.g., "Notion API", "Git Workflows"), NOT by project or conversation
+- **No code snippets** in the summary — describe insights in plain language, not code
 - Add inline diagrams ONLY for topics that genuinely benefit from visual explanation
 - Use Typst math mode for formulas: `$F approx 6 N D$`
 - The template handles CJK text natively — no special configuration needed

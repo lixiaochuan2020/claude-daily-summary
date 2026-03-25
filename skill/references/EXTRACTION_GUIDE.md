@@ -2,66 +2,63 @@
 
 ## Purpose
 
-This guide helps identify meaningful learnings from Claude conversation history. The goal is to surface what the user actually learned, not just what they did.
+Extract **transferable knowledge** from Claude conversations — things you could teach someone else or apply in a different context. This is NOT an activity log. Never describe what was built or debugged; describe what was **learned** in the process.
 
-## What Counts as a Learning
+## The Core Question
 
-### Include
-- **New concepts**: Something the user asked about that they didn't know before
-- **Aha moments**: When the user's understanding was corrected or deepened
-- **New tools/commands**: Commands, tools, or techniques the user hadn't used before
-- **Problem-solving patterns**: How a tricky problem was diagnosed and solved
-- **Architecture decisions**: Design choices and their rationale
-- **Configuration knowledge**: Setup steps, config options, environment details
-- **Best practices**: Coding patterns, security practices, or workflow improvements
+For every conversation, ask: **"If I had this same type of problem again in 6 months, what would I wish I remembered?"**
 
-### Exclude
-- Routine operations (git add, commit, push)
-- Simple file reads/writes without learning context
-- Tool invocations that are just mechanical steps
-- Repeated questions about the same thing (consolidate into one learning)
-- Plan mode discussions (unless they contain architectural insights)
+If the answer is nothing — skip it entirely.
 
-## How to Identify User Questions
+## What Counts as Knowledge
 
-User messages that indicate learning:
-- Questions starting with "how", "why", "what is", "can I", "should I"
-- Messages expressing confusion: "I don't understand", "this doesn't work"
-- Requests for explanation: "explain", "what does X mean"
-- Debugging requests: "why is this failing", "what's wrong with"
+### Include — Transferable Insights
+- **Concepts**: A mental model, principle, or idea you didn't know before (e.g., "Typst compiles with `--root /` to allow absolute path imports")
+- **Aha moments**: When your understanding was corrected or deepened (e.g., "uv is cross-platform — the platform-dependent part is actually typst installation, not uv")
+- **Techniques**: A reusable approach, pattern, or command you hadn't used before
+- **Design rationale**: *Why* a certain approach is better than alternatives (not *that* you chose it)
+- **Gotchas**: Surprising behavior, common pitfalls, or non-obvious constraints
 
-## How to Extract Knowledge Points
+### Exclude — Activity and Process
+- What was built, fixed, or implemented (that's a changelog, not learning)
+- Step-by-step development process ("first I created X, then modified Y")
+- Bug descriptions and their fixes (unless the root cause reveals a transferable insight)
+- File-by-file change descriptions
+- Git operations, deployment steps, routine commands
+- Plan mode discussions, code review iterations
+- Project management decisions (branch naming, PR creation, etc.)
 
-For each meaningful exchange:
+## Examples
 
-1. **Identify the topic**: What subject area does this cover?
-2. **State the learning**: What did the user learn? Write it as a concise bullet point.
-3. **Include context**: If a code snippet or command was key, include it.
-4. **Note the project**: Which project was this conversation about?
+### BAD (activity log)
+- "Created a Notion integration script that fetches vocabulary words"
+- "Fixed a bug where the date filter wasn't working in the query"
+- "Updated install.sh to include Notion config fields"
+- "Added a vocab-card component to the Typst template"
+
+### GOOD (transferable knowledge)
+- "Notion API requires `Notion-Version` header — without it, requests silently return empty results"
+- "Notion block children API paginates at 100 blocks — must loop with `start_cursor` to get all content"
+- "`uv` is cross-platform (macOS/Linux/Windows), but `typst` installation is platform-dependent (`brew` on macOS, `cargo` or binary download on Linux)"
+- "For a project with only one dependency (`requests`), `uv` adds overhead — could use stdlib `urllib.request` instead for zero tooling"
+
+## Brevity Rules
+
+- **One bullet point per insight**, not per conversation
+- Each bullet should be 1-2 sentences max
+- If you can't state the learning in 2 sentences, you're describing process, not knowledge
+- Aim for **5-15 total learnings** for a full day, not 30+
+- A day with 3 deep insights is better than 20 shallow ones
 
 ## Grouping Strategy
 
-Group learnings by:
-1. **Project** (primary grouping) - Which codebase/project was involved
-2. **Topic** (secondary grouping) - Within a project, group related learnings
+Group by **knowledge domain** (not by project or conversation):
+- e.g., "Typst & PDF Generation", "Notion API", "Git Workflows", "Python Packaging"
+- Only create a group if it has 2+ learnings; otherwise fold into a general section
 
 ## Quality Filters
 
-- **Consolidate duplicates**: If the same thing was discussed multiple times, merge into one point
-- **Prioritize depth**: A detailed explanation of one concept > five superficial mentions
-- **Be specific**: "Learned about git rebase" is bad. "Learned that `git rebase -i` can squash commits to clean up history before PR" is good.
-- **Include the 'why'**: Don't just state what was learned, but why it matters when possible
-
-## Output Format
-
-For each learning, produce:
-
-```json
-{
-  "project": "project-name",
-  "topic": "Topic Area",
-  "learning": "Concise description of what was learned",
-  "type": "concept|command|pattern|debug|config",
-  "snippet": "optional code/command snippet"
-}
-```
+- **The "so what?" test**: After writing a learning, ask "so what?" If you can't answer why it matters, cut it.
+- **The "would I Google this?" test**: If you'd search for this info again later, it's worth including.
+- **Consolidate**: If 5 conversations touched the same topic, produce 1-2 bullet points, not 5.
+- **Be specific**: "Learned about Notion API" is useless. "Notion API date filters use ISO 8601 format in the `equals` field" is useful.
